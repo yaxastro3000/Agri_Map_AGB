@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Mapa de tipos de agricultura y toneladas de CO2 por quema agricola en el estado de Hidalgo.</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="data/MunicipiosdeHidalgo_1.js"></script>
+        <script src="data/RegionessocioculturalesdeHidalgo_2.js"></script>
+        <script src="data/UsodesueloagricolaenHidalgo_3.js"></script>
+        <script src="data/CO233109327Tons_4.js"></script>
+        <script src="data/CO224183310Tons_5.js"></script>
+        <script src="data/CO214612418Tons_6.js"></script>
+        <script src="data/CO27921461Tons_7.js"></script>
+        <script src="data/CO287792Tons_8.js"></script>
+        <script src="data/LocalidadesconndicedeRezagoSocialAlto_9.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[19.515776835935498,-100.69493874727227],[21.421059028279927,-97.15506974334009]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_MunicipiosdeHidalgo_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CVE_ENT'] !== null ? autolinker.link(feature.properties['CVE_ENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CVE_MUN'] !== null ? autolinker.link(feature.properties['CVE_MUN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CVEGEO'] !== null ? autolinker.link(feature.properties['CVEGEO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_ENT'] !== null ? autolinker.link(feature.properties['NOM_ENT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA'] !== null ? autolinker.link(feature.properties['AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PERIMETER'] !== null ? autolinker.link(feature.properties['PERIMETER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_MUN'] !== null ? autolinker.link(feature.properties['NOM_MUN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COV_'] !== null ? autolinker.link(feature.properties['COV_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COV_ID'] !== null ? autolinker.link(feature.properties['COV_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID_MUN'] !== null ? autolinker.link(feature.properties['ID_MUN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_MunicipiosdeHidalgo_1_0() {
+            return {
+                pane: 'pane_MunicipiosdeHidalgo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 4.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(152,125,183,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_MunicipiosdeHidalgo_1');
+        map.getPane('pane_MunicipiosdeHidalgo_1').style.zIndex = 401;
+        map.getPane('pane_MunicipiosdeHidalgo_1').style['mix-blend-mode'] = 'normal';
+        var layer_MunicipiosdeHidalgo_1 = new L.geoJson(json_MunicipiosdeHidalgo_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MunicipiosdeHidalgo_1',
+            layerName: 'layer_MunicipiosdeHidalgo_1',
+            pane: 'pane_MunicipiosdeHidalgo_1',
+            onEachFeature: pop_MunicipiosdeHidalgo_1,
+            style: style_MunicipiosdeHidalgo_1_0,
+        });
+        bounds_group.addLayer(layer_MunicipiosdeHidalgo_1);
+        map.addLayer(layer_MunicipiosdeHidalgo_1);
+        function pop_RegionessocioculturalesdeHidalgo_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Region'] !== null ? autolinker.link(feature.properties['Region'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_RegionessocioculturalesdeHidalgo_2_0() {
+            return {
+                pane: 'pane_RegionessocioculturalesdeHidalgo_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.2563607843137255)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 4.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,8,16,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_RegionessocioculturalesdeHidalgo_2');
+        map.getPane('pane_RegionessocioculturalesdeHidalgo_2').style.zIndex = 402;
+        map.getPane('pane_RegionessocioculturalesdeHidalgo_2').style['mix-blend-mode'] = 'normal';
+        var layer_RegionessocioculturalesdeHidalgo_2 = new L.geoJson(json_RegionessocioculturalesdeHidalgo_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RegionessocioculturalesdeHidalgo_2',
+            layerName: 'layer_RegionessocioculturalesdeHidalgo_2',
+            pane: 'pane_RegionessocioculturalesdeHidalgo_2',
+            onEachFeature: pop_RegionessocioculturalesdeHidalgo_2,
+            style: style_RegionessocioculturalesdeHidalgo_2_0,
+        });
+        bounds_group.addLayer(layer_RegionessocioculturalesdeHidalgo_2);
+        map.addLayer(layer_RegionessocioculturalesdeHidalgo_2);
+        function pop_UsodesueloagricolaenHidalgo_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Tipo de terreno</th>\
+                        <td>' + (feature.properties['DESCRIPCIO'] !== null ? autolinker.link(feature.properties['DESCRIPCIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Área (Ha)</th>\
+                        <td>' + (feature.properties['Area 3(Ha)'] !== null ? autolinker.link(feature.properties['Area 3(Ha)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_UsodesueloagricolaenHidalgo_3_0(feature) {
+            switch(String(feature.properties['DESCRIPCIO'])) {
+                case 'AGRICULTURA DE HUMEDAD ANUAL':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(12,242,35,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE RIEGO ANUAL':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE RIEGO ANUAL Y PERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(130,205,125,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE RIEGO ANUAL Y SEMIPERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(4,216,64,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE RIEGO SEMIPERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(68,243,117,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE RIEGO SEMIPERMANENTE Y PERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,244,223,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL ANUAL':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,232,30,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL ANUAL Y PERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,255,15,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL ANUAL Y SEMIPERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,246,108,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL PERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,231,167,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL SEMIPERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,215,149,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'AGRICULTURA DE TEMPORAL SEMIPERMANENTE Y PERMANENTE':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(236,166,54,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'ASENTAMIENTOS HUMANOS':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,65,80,0.4)',
+                interactive: true,
+            }
+                    break;
+                case 'CUERPO DE AGUA':
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.4)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,254,246,0.4)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_UsodesueloagricolaenHidalgo_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(250,250,250,0.0015686274509803923)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_UsodesueloagricolaenHidalgo_3');
+        map.getPane('pane_UsodesueloagricolaenHidalgo_3').style.zIndex = 403;
+        map.getPane('pane_UsodesueloagricolaenHidalgo_3').style['mix-blend-mode'] = 'normal';
+        var layer_UsodesueloagricolaenHidalgo_3 = new L.geoJson(json_UsodesueloagricolaenHidalgo_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_UsodesueloagricolaenHidalgo_3',
+            layerName: 'layer_UsodesueloagricolaenHidalgo_3',
+            pane: 'pane_UsodesueloagricolaenHidalgo_3',
+            onEachFeature: pop_UsodesueloagricolaenHidalgo_3,
+            style: style_UsodesueloagricolaenHidalgo_3_0,
+        });
+        bounds_group.addLayer(layer_UsodesueloagricolaenHidalgo_3);
+        map.addLayer(layer_UsodesueloagricolaenHidalgo_3);
+        function pop_CO233109327Tons_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Toneladas de CO2</th>\
+                        <td>' + (feature.properties['CO2_AWB'] !== null ? autolinker.link(feature.properties['CO2_AWB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CO233109327Tons_4_0() {
+            return {
+                pane: 'pane_CO233109327Tons_4',
+                radius: 28.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,1,81,0.5137254901960784)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CO233109327Tons_4');
+        map.getPane('pane_CO233109327Tons_4').style.zIndex = 404;
+        map.getPane('pane_CO233109327Tons_4').style['mix-blend-mode'] = 'normal';
+        var layer_CO233109327Tons_4 = new L.geoJson(json_CO233109327Tons_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CO233109327Tons_4',
+            layerName: 'layer_CO233109327Tons_4',
+            pane: 'pane_CO233109327Tons_4',
+            onEachFeature: pop_CO233109327Tons_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CO233109327Tons_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CO233109327Tons_4);
+        map.addLayer(layer_CO233109327Tons_4);
+        function pop_CO224183310Tons_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Toneladas de CO2</th>\
+                        <td>' + (feature.properties['CO2_AWB'] !== null ? autolinker.link(feature.properties['CO2_AWB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CO224183310Tons_5_0() {
+            return {
+                pane: 'pane_CO224183310Tons_5',
+                radius: 20.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,4,41,0.4980392156862745)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CO224183310Tons_5');
+        map.getPane('pane_CO224183310Tons_5').style.zIndex = 405;
+        map.getPane('pane_CO224183310Tons_5').style['mix-blend-mode'] = 'normal';
+        var layer_CO224183310Tons_5 = new L.geoJson(json_CO224183310Tons_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CO224183310Tons_5',
+            layerName: 'layer_CO224183310Tons_5',
+            pane: 'pane_CO224183310Tons_5',
+            onEachFeature: pop_CO224183310Tons_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CO224183310Tons_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CO224183310Tons_5);
+        map.addLayer(layer_CO224183310Tons_5);
+        function pop_CO214612418Tons_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Toneladas de CO2</th>\
+                        <td>' + (feature.properties['CO2_AWB'] !== null ? autolinker.link(feature.properties['CO2_AWB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CO214612418Tons_6_0() {
+            return {
+                pane: 'pane_CO214612418Tons_6',
+                radius: 16.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,18,25,0.5019607843137255)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CO214612418Tons_6');
+        map.getPane('pane_CO214612418Tons_6').style.zIndex = 406;
+        map.getPane('pane_CO214612418Tons_6').style['mix-blend-mode'] = 'normal';
+        var layer_CO214612418Tons_6 = new L.geoJson(json_CO214612418Tons_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CO214612418Tons_6',
+            layerName: 'layer_CO214612418Tons_6',
+            pane: 'pane_CO214612418Tons_6',
+            onEachFeature: pop_CO214612418Tons_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CO214612418Tons_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CO214612418Tons_6);
+        map.addLayer(layer_CO214612418Tons_6);
+        function pop_CO27921461Tons_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Toneladas de CO2</th>\
+                        <td>' + (feature.properties['CO2_AWB'] !== null ? autolinker.link(feature.properties['CO2_AWB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CO27921461Tons_7_0() {
+            return {
+                pane: 'pane_CO27921461Tons_7',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,54,63,0.4549019607843137)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CO27921461Tons_7');
+        map.getPane('pane_CO27921461Tons_7').style.zIndex = 407;
+        map.getPane('pane_CO27921461Tons_7').style['mix-blend-mode'] = 'normal';
+        var layer_CO27921461Tons_7 = new L.geoJson(json_CO27921461Tons_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CO27921461Tons_7',
+            layerName: 'layer_CO27921461Tons_7',
+            pane: 'pane_CO27921461Tons_7',
+            onEachFeature: pop_CO27921461Tons_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CO27921461Tons_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CO27921461Tons_7);
+        map.addLayer(layer_CO27921461Tons_7);
+        function pop_CO287792Tons_8(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Toneladas de CO2</th>\
+                        <td>' + (feature.properties['CO2_AWB'] !== null ? autolinker.link(feature.properties['CO2_AWB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_CO287792Tons_8_0() {
+            return {
+                pane: 'pane_CO287792Tons_8',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,100,83,0.41568627450980394)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CO287792Tons_8');
+        map.getPane('pane_CO287792Tons_8').style.zIndex = 408;
+        map.getPane('pane_CO287792Tons_8').style['mix-blend-mode'] = 'normal';
+        var layer_CO287792Tons_8 = new L.geoJson(json_CO287792Tons_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CO287792Tons_8',
+            layerName: 'layer_CO287792Tons_8',
+            pane: 'pane_CO287792Tons_8',
+            onEachFeature: pop_CO287792Tons_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CO287792Tons_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CO287792Tons_8);
+        map.addLayer(layer_CO287792Tons_8);
+        function pop_LocalidadesconndicedeRezagoSocialAlto_9(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Municipio</strong><br />' + (feature.properties['Municipio'] !== null ? autolinker.link(feature.properties['Municipio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Localidad</strong><br />' + (feature.properties['Localidad'] !== null ? autolinker.link(feature.properties['Localidad'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Población Total</th>\
+                        <td>' + (feature.properties['Población total'] !== null ? autolinker.link(feature.properties['Población total'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Población sin servicios de salud</th>\
+                        <td>' + (feature.properties['Población sin derechohabiencia a servicios de salud'] !== null ? autolinker.link(feature.properties['Población sin derechohabiencia a servicios de salud'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Vivienda_tierra</th>\
+                        <td>' + (feature.properties['Viviendas con piso de tierra'] !== null ? autolinker.link(feature.properties['Viviendas con piso de tierra'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Viviendas sin excusado</th>\
+                        <td>' + (feature.properties['Viviendas que no disponen de excusado o sanitario'] !== null ? autolinker.link(feature.properties['Viviendas que no disponen de excusado o sanitario'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Viviendas sin agua entubada</th>\
+                        <td>' + (feature.properties['Viviendas que no disponen de agua entubada de la red pública'] !== null ? autolinker.link(feature.properties['Viviendas que no disponen de agua entubada de la red pública'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Viviendas sin drenaje</th>\
+                        <td>' + (feature.properties['Viviendas que no disponen de drenaje'] !== null ? autolinker.link(feature.properties['Viviendas que no disponen de drenaje'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Viviendas sin energía eléctrica</th>\
+                        <td>' + (feature.properties['Viviendas que no disponen de energía eléctrica'] !== null ? autolinker.link(feature.properties['Viviendas que no disponen de energía eléctrica'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Viviendas sin refrigerador</th>\
+                        <td>' + (feature.properties['Viviendas que no disponen de refrigerador'] !== null ? autolinker.link(feature.properties['Viviendas que no disponen de refrigerador'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">IRS</th>\
+                        <td>' + (feature.properties['Índice de Rezago Social'] !== null ? autolinker.link(feature.properties['Índice de Rezago Social'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GRS</th>\
+                        <td>' + (feature.properties['Grado de Rezago Social'] !== null ? autolinker.link(feature.properties['Grado de Rezago Social'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lugar de rezago en Hgo</th>\
+                        <td>' + (feature.properties['Lugar que ocupa en el contexto de la entidad'] !== null ? autolinker.link(feature.properties['Lugar que ocupa en el contexto de la entidad'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_LocalidadesconndicedeRezagoSocialAlto_9_0() {
+            return {
+                pane: 'pane_LocalidadesconndicedeRezagoSocialAlto_9',
+                shape: 'square',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(113,127,232,0.3764705882352941)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_LocalidadesconndicedeRezagoSocialAlto_9');
+        map.getPane('pane_LocalidadesconndicedeRezagoSocialAlto_9').style.zIndex = 409;
+        map.getPane('pane_LocalidadesconndicedeRezagoSocialAlto_9').style['mix-blend-mode'] = 'normal';
+        var layer_LocalidadesconndicedeRezagoSocialAlto_9 = new L.geoJson(json_LocalidadesconndicedeRezagoSocialAlto_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LocalidadesconndicedeRezagoSocialAlto_9',
+            layerName: 'layer_LocalidadesconndicedeRezagoSocialAlto_9',
+            pane: 'pane_LocalidadesconndicedeRezagoSocialAlto_9',
+            onEachFeature: pop_LocalidadesconndicedeRezagoSocialAlto_9,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_LocalidadesconndicedeRezagoSocialAlto_9_0(feature));
+            },
+        });
+        var cluster_LocalidadesconndicedeRezagoSocialAlto_9 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_LocalidadesconndicedeRezagoSocialAlto_9.addLayer(layer_LocalidadesconndicedeRezagoSocialAlto_9);
+
+        bounds_group.addLayer(layer_LocalidadesconndicedeRezagoSocialAlto_9);
+        cluster_LocalidadesconndicedeRezagoSocialAlto_9.addTo(map);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Mapa de tipos de agricultura y toneladas de CO2 por quema agricola en el estado de Hidalgo.</h2>';
+            };
+            title.addTo(map);
+            var abstract = new L.Control({'position':'topright'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+
+                    abstract.show();
+                    return this._div;
+                };
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'Mapa de regiones agrícolas por uso de suelo y contaminación por quema de cultivos en estado de <br />Hidalgo, así como su relación a la presencia de localidades con alto rezago social, indicado en agrupamientos de numeros.';
+            };
+            abstract.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/LocalidadesconndicedeRezagoSocialAlto_9.png" /> Localidades con Índice de Rezago Social Alto': cluster_LocalidadesconndicedeRezagoSocialAlto_9,'<img src="legend/CO287792Tons_8.png" /> CO2 87-792 Tons': layer_CO287792Tons_8,'<img src="legend/CO27921461Tons_7.png" /> CO2 792-1461 Tons': layer_CO27921461Tons_7,'<img src="legend/CO214612418Tons_6.png" /> CO2 1461-2418 Tons': layer_CO214612418Tons_6,'<img src="legend/CO224183310Tons_5.png" /> CO2 2418-3310 Tons': layer_CO224183310Tons_5,'<img src="legend/CO233109327Tons_4.png" /> CO2 3310-9327 Tons': layer_CO233109327Tons_4,'Uso de suelo agricola en Hidalgo<br /><table><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADEHUMEDADANUAL0.png" /></td><td>AGRICULTURA DE HUMEDAD ANUAL</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADERIEGOANUAL1.png" /></td><td>AGRICULTURA DE RIEGO ANUAL</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADERIEGOANUALYPERMANENTE2.png" /></td><td>AGRICULTURA DE RIEGO ANUAL Y PERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADERIEGOANUALYSEMIPERMANENTE3.png" /></td><td>AGRICULTURA DE RIEGO ANUAL Y SEMIPERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADERIEGOSEMIPERMANENTE4.png" /></td><td>AGRICULTURA DE RIEGO SEMIPERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADERIEGOSEMIPERMANENTEYPERMANENTE5.png" /></td><td>AGRICULTURA DE RIEGO SEMIPERMANENTE Y PERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALANUAL6.png" /></td><td>AGRICULTURA DE TEMPORAL ANUAL</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALANUALYPERMANENTE7.png" /></td><td>AGRICULTURA DE TEMPORAL ANUAL Y PERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALANUALYSEMIPERMANENTE8.png" /></td><td>AGRICULTURA DE TEMPORAL ANUAL Y SEMIPERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALPERMANENTE9.png" /></td><td>AGRICULTURA DE TEMPORAL PERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALSEMIPERMANENTE10.png" /></td><td>AGRICULTURA DE TEMPORAL SEMIPERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_AGRICULTURADETEMPORALSEMIPERMANENTEYPERMANENTE11.png" /></td><td>AGRICULTURA DE TEMPORAL SEMIPERMANENTE Y PERMANENTE</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_ASENTAMIENTOSHUMANOS12.png" /></td><td>ASENTAMIENTOS HUMANOS</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_CUERPODEAGUA13.png" /></td><td>CUERPO DE AGUA</td></tr><tr><td style="text-align: center;"><img src="legend/UsodesueloagricolaenHidalgo_3_14.png" /></td><td></td></tr></table>': layer_UsodesueloagricolaenHidalgo_3,'<img src="legend/RegionessocioculturalesdeHidalgo_2.png" /> Regiones socio-culturales de Hidalgo': layer_RegionessocioculturalesdeHidalgo_2,'<img src="legend/MunicipiosdeHidalgo_1.png" /> Municipios de Hidalgo': layer_MunicipiosdeHidalgo_1,"OSM Standard": layer_OSMStandard_0,}).addTo(map);
+        setBounds();
+        resetLabels([layer_MunicipiosdeHidalgo_1]);
+        map.on("zoomend", function(){
+            resetLabels([layer_MunicipiosdeHidalgo_1]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_MunicipiosdeHidalgo_1]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_MunicipiosdeHidalgo_1]);
+        });
+        </script>
+    </body>
+</html>
